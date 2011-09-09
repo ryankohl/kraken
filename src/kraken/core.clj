@@ -7,11 +7,14 @@
 (defn in? [x s] (some #(= x %) s))
 
 ;; primitives
+(defn sub-collection? [x y] true)
+(defn mereo-sum [x] x)
+(defn part-of? [x y] true)
 (defn lebesgue-measure [x] 1)
 (defn has-quality? [x q] true)
-(defn proper-sub-universal-of? [x b] true)
+(defn proper-sub-universal-of? [a b] true)
 (defn parts [x] x)
-(defn partition? [x] true)
+(defn partition? [x y] true)
 (defn quality-list [] [1 2 3])
 (defn quality-pattern [x] (filter #(has-quality? x %) (quality-list)))
 
@@ -55,3 +58,22 @@
   (and (partition? p x)
        (every? #(homogeneous? % Q w) p)
        (distinct? (map quality-pattern p))))
+(defn p-included-in?
+  "every member of p1 is part of some member of p2"
+  [p1 p2]
+  (let [f (fn [q Q] (some #(part-of? q %) Q))]
+    (every? #(f % q2) q1)))
+(defn refined-by [p1 p2]
+  (and (w-Q-partition? p1 x w Q1)
+       (w-Q-partition? p2 x w Q2)
+       (proper-sub-universal-of? Q1 Q2)
+       (p-included-in? p2 p1)
+       (not (p-included-in? p1 p2))))
+
+(defn non-local? [Q p x w]
+  (w-Q-partition? p x w Q))
+(defn local? [Q a p x w]
+  (and (partition? p x)
+       (not (w-Q-partition? p x w Q))
+       (sub-collection? a p)
+       (w-Q-partition? a (mereo-sum a) w Q)))
